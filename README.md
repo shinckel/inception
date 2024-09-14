@@ -28,7 +28,7 @@ Your containers have to restart in case of a crash.
 [What are Microservices?](https://www.youtube.com/watch?v=CdBtNQZH8a4)<br />
 [Containerization Explained](https://www.youtube.com/watch?v=0qotVMX-J5s)<br />
 [Contain Yourself: An Intro to Docker and Containers by Nicola Kabar and Mano Marks](https://www.youtube.com/watch?v=arRDKrVGw7k&t=833s)<br />
-[What is Docker?](https://docs.docker.com/get-started/docker-overview/)<br />
+[What is Docker?](https://docs.docker.com/get-started/docker-overview/) *watch demo from the minute 24*<br />
 
 ## Concepts
 
