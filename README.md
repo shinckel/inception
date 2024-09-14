@@ -1,25 +1,42 @@
 # Inception
 This project was developed for 42 school. For comprehensive information regarding the requirements, please consult the PDF file in the subject folder of the repository. Furthermore, I have provided my notes and a concise summary below.
 ``` diff
-+ keywords: raycasting
-+ top down 2D game into 3D
-+ windows, colors, events, shapes 
++ keywords: docker
++ set up small infrastructure composed of different services
++ project done in a virtual machine
++ it must be used docker compose
 ```
 
 ## High-level Overview
 
-This project is inspired by the world-famous Wolfenstein 3D game, developed by John Carmack and John Romero, which was the first FPS (first person shooter) ever. The goal is to make a dynamic view inside a maze, in which you’ll have to find your way.
+Each Docker image must have the same name as its corresponding service. Each service has to run in a dedicated container.
+For performance matters, the containers must be built either from the penultimate stable version of Alpine or Debian.
+Write your own Dockerfiles, one per service.
+
+You then have to set up:
+• A Docker container that contains NGINX with TLSv1.2 or TLSv1.3 only.
+• A Docker container that contains WordPress + php-fpm (it must be installed and
+configured) only without nginx.
+• A Docker container that contains MariaDB only without nginx.
+• A volume that contains your WordPress database.
+• A second volume that contains your WordPress website files.
+• A docker-network that establishes the connection between your containers.
+Your containers have to restart in case of a crash.
 
 ### References:
-[Make Your Own Raycaster Part 1](https://www.youtube.com/watch?v=gYRrGTC7GtA)<br />
-[42 Docs - Cub3D](https://harm-smits.github.io/42docs/projects/cub3d)<br />
-[Wolfenstein 3D game](http://users.atw.hu/wolf3d/)<br />
-[Vectors | Chapter 1, Essence of linear algebra](https://www.youtube.com/watch?v=fNk_zzaMoSs)<br />
-[Lec 1: Dot product | MIT 18.02 Multivariable Calculus, Fall 2007](https://www.youtube.com/watch?v=PxCxlsl_YwY&list=PLYzxBBT5iehMCyHxKZOg9EMETK3nLBbfC)
+[Virtual Machine (VM) vs Docker](https://www.youtube.com/watch?v=a1M_thDTqmU)<br />
 
 ## Concepts
 
 | Task | Prototype | Description |
 |:----|:-----:|:--------:|
-| **Raycasting** | `Raycasting is not the same as raytracing` | Raycasting can go very fast, because only a calculation has to be done for every vertical line of the screen. Later games such as Doom and Duke Nukem 3D also used raycasting, but much more advanced engines that allowed sloped walls, different heights, textured floors and ceilings, transparent walls, etc... `Raytracing` is a realistic rendering technique that supports reflections and shadows in true 3D scenes, and only recently computers became fast enough to do it in realtime for reasonably high resolutions and complex scenes. |
-| **Sprites** | x | The sprites (enemies, objects and goodies) are 2D images. |
+| **VM && docker** | `abstraction layer`| Software is used to create an abstraction layer(virtualization). |
+| **Virtual machine** | `Hypervisor` | Virtual machine emulates the physical computer, managing the allocation of resources (virtual hardware, virtual CPU, guest OS, etc) from a single physical host. **Benefits:** diverse OS, isolation/separated kernel and OS, set environment for running legacy applications. **Downsides:** deploy a separated guest OS everytime you create a VM, binary library, etc, even for a small application. It takes a lot of resources. |
+| **Docker** | `Containerization` | Open source platform that uses containerization. Package of application and dependencies into lightweight containers. An individual container has only the application and its libraries and dependencies. **Benefits:** Microservices, speed development/deployment/scale up, CI/CD pipelines, resource efficiency/small footprint. |
+| **Docker engine** | `orchestrating containers` | Creating, running and orchestrating containers. Interact with host kernel to allocate resources and force isolation between containers. **Control groups, namespaces**: restrict access and visibility to others. |
+| **Docker image** | `executable packages` | Runtime code/libraries/tools/lightweight standalone. Executable packages, which are built using **Dockerfile**. |
+| **Docker container** | `isolated environment` | Instances of the docker images, running in the docker engine. Isolated in a self-sufficient environment. |
+| **Dockerfile** | `manifest` | Instructions for building the images. |
+| **Microservices** | `modular application architecture` | Every app function is its own service running in a container. Services communicate via API, in a modular and more flexible way: you can use different languages/frameworks, deploy it fast, if one service fails/crash the rest continue to run in an independent way. It is also possible to add capability to a specific service that is more required e.g. payment service for a webside selling ticket to the final game. |
+| **Monolith** | `` ||
+
