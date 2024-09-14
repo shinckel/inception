@@ -25,6 +25,9 @@ Your containers have to restart in case of a crash.
 
 ### References:
 [Virtual Machine (VM) vs Docker](https://www.youtube.com/watch?v=a1M_thDTqmU)<br />
+[What are Microservices?](https://www.youtube.com/watch?v=CdBtNQZH8a4)<br />
+[Containerization Explained](https://www.youtube.com/watch?v=0qotVMX-J5s)<br />
+[Contain Yourself: An Intro to Docker and Containers by Nicola Kabar and Mano Marks](https://www.youtube.com/watch?v=arRDKrVGw7k&t=833s)<br />
 
 ## Concepts
 
