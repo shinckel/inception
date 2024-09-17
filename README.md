@@ -23,6 +23,10 @@ configured) only without nginx.
 • A docker-network that establishes the connection between your containers.
 Your containers have to restart in case of a crash.
 
+-| layouts/
+---| default.vue
+---| custom.vue
+
 ### References:
 [Virtual Machine (VM) vs Docker](https://www.youtube.com/watch?v=a1M_thDTqmU)<br />
 [What are Microservices?](https://www.youtube.com/watch?v=CdBtNQZH8a4)<br />
