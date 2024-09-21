@@ -38,12 +38,21 @@ loop. Thus, this also applies to any command used as entrypoint, or
 used in entrypoint scripts. The following are a few prohibited hacky
 patches: tail -f, bash, sleep infinity, while true.
 
+```
+- docker info
+- docker run -d -P [image-name] (locally or remotely, - flags tell how to run the container)
+
+- docker ps (you should see the container running)
+access and visualize it through its port
+```
+
 ### References:
 [Virtual Machine (VM) vs Docker](https://www.youtube.com/watch?v=a1M_thDTqmU)<br />
 [What are Microservices?](https://www.youtube.com/watch?v=CdBtNQZH8a4)<br />
 [Containerization Explained](https://www.youtube.com/watch?v=0qotVMX-J5s)<br />
 [Contain Yourself: An Intro to Docker and Containers by Nicola Kabar and Mano Marks](https://www.youtube.com/watch?v=arRDKrVGw7k&t=833s)<br />
 [What is Docker?](https://docs.docker.com/get-started/docker-overview/) *watch demo from minute 24*<br />
+[Apache+PHP Dockerfile Demo](https://github.com/nicolaka/demo_cs50)<br />
 
 ## Concepts
 
