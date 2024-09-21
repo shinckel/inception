@@ -46,7 +46,34 @@ patches: tail -f, bash, sleep infinity, while true.
 - docker run -d -P [image-name] (locally or remotely, - flags tell how to run the container)
 
 - docker ps (you should see the container running)
-access and visualize it through its port
+- access and visualize the deployed application through [ip number]/port
+
+- docker build -t name/demo:v1 . (build and name the image)
+- docker run -d -P name/demo:v1 (run a container)
+
+- docker build -t name/demo:v2 . (edit the source file and build another image, changing the version tag. it will use the cache and build super fast)
+
+- share container with friends -> docker push name/demo:v2
+
+# A basic Apache+PHP Image 
+FROM ubuntu:12.04
+
+MAINTAINER Nicola Kabar version: 0.1
+
+RUN apt-get update && apt-get install -y apache2
+
+RUN apt-get install -y php5
+
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+
+RUN rm -rf /var/www/*
+ADD index.php /var/www/
+
+EXPOSE 80
+
+CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
 ```
 
 ### References:
