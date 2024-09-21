@@ -10,7 +10,7 @@ This project was developed for 42 school. For comprehensive information regardin
 ## High-level Overview
 
 Each Docker image must have the same name as its corresponding service. Each service has to run in a dedicated container.
-For performance matters, the containers must be built either from the penultimate stable version of Alpine or Debian.
+For performance matters, the containers must be built either from the penultimate stable version of Alpine or Debian. The Dockerfiles must be called in your docker-compose.yml by your Makefile.
 Write your own Dockerfiles, one per service.
 
 You then have to set up:
@@ -28,6 +28,15 @@ Your containers have to restart in case of a crash.
 ---| default.vue
 ---| custom.vue
 ```
+
+![alt text](image.png)
+
+Using network: host or --link or links: is forbidden.
+The network line must be present in your docker-compose.yml file.
+Your containers musn’t be started with a command running an infinite
+loop. Thus, this also applies to any command used as entrypoint, or
+used in entrypoint scripts. The following are a few prohibited hacky
+patches: tail -f, bash, sleep infinity, while true.
 
 ### References:
 [Virtual Machine (VM) vs Docker](https://www.youtube.com/watch?v=a1M_thDTqmU)<br />
