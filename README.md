@@ -53,7 +53,7 @@ patches: tail -f, bash, sleep infinity, while true.
 
 - docker build -t name/demo:v2 . (edit the source file and build another image, changing the version tag. it will use the cache and build super fast)
 
-- share container with friends -> docker push name/demo:v2
+- share container with friends in dockerHub -> docker push name/demo:v2
 
 # A basic Apache+PHP Image 
 FROM ubuntu:12.04
