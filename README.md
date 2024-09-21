@@ -7,6 +7,9 @@ This project was developed for 42 school. For comprehensive information regardin
 + it must be used docker compose
 ```
 
+_Mindmap (shinckel, 2024)_
+![Mind Map 42(1)](https://github.com/user-attachments/assets/366bcf65-d67e-49b4-8d35-50f411380fc3)
+
 ## High-level Overview
 
 Each Docker image must have the same name as its corresponding service. Each service has to run in a dedicated container.
