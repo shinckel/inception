@@ -42,13 +42,16 @@ used in entrypoint scripts. The following are a few prohibited hacky
 patches: tail -f, bash, sleep infinity, while true.
 
 ```
-- docker info
-- docker run -d -P [image-name] (locally or remotely, - flags tell how to run the container)
+- docker info (how many images)
+- docker version
+- docker run (if doesn't have an image locally, it talks to dockerHub remotelly)
+- time docker run hello-world (how much time takes to run the container in ms)
+- docker run -d -P [image-name] (locally or remotely, - flags tell how to run the container, P is for mapping a random port on the host to a specified port within the container itself)
 
 - docker ps (you should see the container running)
 - access and visualize the deployed application through [ip number]/port
 
-- docker build -t name/demo:v1 . (build and name the image)
+- docker build -t name/demo:v1 . (build and name the image, add a tag e.g. v1)
 - docker run -d -P name/demo:v1 (run a container)
 
 - docker build -t name/demo:v2 . (edit the source file and build another image, changing the version tag. it will use the cache and build super fast)
