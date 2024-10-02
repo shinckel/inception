@@ -3,29 +3,40 @@
 #                                                         :::      ::::::::    #
 #    Dockerfile                                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: shinckel <shinckel@student.42.fr>          +#+  +:+       +#+         #
+#    By: shinckel <shinckel@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/09/21 17:25:09 by shinckel          #+#    #+#              #
-#    Updated: 2024/09/21 17:27:34 by shinckel         ###   ########.fr        #
+#    Created: 2024/10/02 12:52:09 by shinckel          #+#    #+#              #
+#    Updated: 2024/10/02 12:52:11 by shinckel         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-# A basic Apache+PHP Image 
-FROM ubuntu:12.04
+# build images automatically by reading the instructions from a Dockerfile
 
-MAINTAINER Nicola Kabar version: 0.1
+# Create a new build stage from a base image
+FROM debian:buster 
 
-RUN apt-get update && apt-get install -y apache2
+# Describe which ports your application is listening on.
+EXPOSE 3306
 
-RUN apt-get install -y php5
+# Use build-time variables.
+ARG DB_NAME=${DB_NAME}
+ARG DB_USER=${DB_USER}
+ARG DB_PASSWORD=${DB_PASSWORD}
+ARG DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
 
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2
+# Execute build commands.
+RUN apt-get update && apt-get install \
+	mariadb-server -y && \
+	rm -rf /var/lib/apt/lists/*
 
-RUN rm -rf /var/www/*
-ADD index.php /var/www/
+RUN rm /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d
 
-EXPOSE 80
+# Copy files and directories.
+COPY tools/create_user.sh /
+RUN bash ./create_user.sh
 
-CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
+RUN rm -rf create_user.sh
+
+# Specify default commands.
+CMD ["mysqld_safe"]

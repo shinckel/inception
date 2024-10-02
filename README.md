@@ -3,8 +3,9 @@ This project was developed for 42 school. For comprehensive information regardin
 ``` diff
 + keywords: docker
 + set up small infrastructure composed of different services
-+ project done in a virtual machine
-+ it must be used docker compose
++ docker virtualises the operating system, lightweight (only one kernel) and portable containers
++ move from monolith apps to a service oriented architecture
++ development - testing - production
 ```
 
 _Mindmap (shinckel, 2024)_
@@ -27,10 +28,23 @@ configured) only without nginx.
 Your containers have to restart in case of a crash.
 
 ```
--| layouts/
----| default.vue
----| custom.vue
+-| srcs/
+---| docker-compose
+---| requirements/
+----| mariadb/ (database)
+-----| Dockerfile
+----| nginx/ (web server)
+-----| Dockerfile
+----| wordpress
+-----| Dockerfile
+| Makefile
 ```
+
+### Relationship Between MariaDB, Nginx, and WordPress
+- MariaDB: This container runs the MariaDB database server, which stores all the data for your WordPress site.
+- Nginx: This container runs the Nginx web server, which serves as a reverse proxy to forward HTTPS requests to the WordPress container.
+- WordPress: This container runs WordPress with PHP-FPM, which processes PHP code and generates dynamic content for the website.
+-All services run in separate containers, connected via a Docker network, with volumes for persistent storage. The docker-compose.yml and Makefile automate the setup and management of these containers.
 
 ![alt text](image.png)
 
@@ -42,6 +56,9 @@ used in entrypoint scripts. The following are a few prohibited hacky
 patches: tail -f, bash, sleep infinity, while true.
 
 ```
+- apt-get install docker-engine (debian/ubuntu)
+- docker toolbox (download to mac, creates a VM for running docker)
+
 - docker info (how many images)
 - docker version
 - docker run (if doesn't have an image locally, it talks to dockerHub remotelly)
@@ -55,8 +72,14 @@ patches: tail -f, bash, sleep infinity, while true.
 - docker run -d -P name/demo:v1 (run a container)
 
 - docker build -t name/demo:v2 . (edit the source file and build another image, changing the version tag. it will use the cache and build super fast)
+- docker images
 
 - share container with friends in dockerHub -> docker push name/demo:v2
+
+- docker logs image-name
+- docker rm image-name
+- docker ps -a (list all containers, including the ones that have stopped)
+- docker stop container-name
 
 # A basic Apache+PHP Image 
 FROM ubuntu:12.04
@@ -79,6 +102,22 @@ EXPOSE 80
 CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
 ```
 
+```
+$ docker pull centos
+$ docker run -d -t --name myfirstcontainer centos
+$ docker ps
+> CONTAINER ID   IMAGE     COMMAND       CREATED         STATUS         PORTS     NAMES
+> abd188b5d3a4   centos    "/bin/bash"   3 seconds ago   Up 2 seconds             myfirstcontainer
+$ docker exec -it myfirstcontainer bash
+[root@abd188b5d3a4 /]# --> you are inside the container, connected to bash shell
+
+$ docker pull alpine
+$ docker run -d -t --name mysecondcontainer alpine
+$ docker exec -it mysecondcontainer sh
+> / #
+> exit
+```
+
 ### References:
 [Virtual Machine (VM) vs Docker](https://www.youtube.com/watch?v=a1M_thDTqmU)<br />
 [What are Microservices?](https://www.youtube.com/watch?v=CdBtNQZH8a4)<br />
@@ -91,7 +130,7 @@ CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
 
 | Task | Prototype | Description |
 |:----|:-----:|:--------:|
-| **VM && docker** | `abstraction layer`| Software is used to create an abstraction layer(virtualization). |
+| **VM && docker** | `abstraction layer`| Software is used to create an abstraction layer(virtualization). VM lifecycle is measured in months. Container lifecycle is measured in seconds. |
 | **Virtual machine** | `Hypervisor` | Virtual machine emulates the physical computer, managing the allocation of resources (virtual hardware, virtual CPU, guest OS, etc) from a single physical host. **Benefits:** diverse OS, isolation/separated kernel and OS, set environment for running legacy applications. **Downsides:** deploy a separated guest OS everytime you create a VM, binary library, etc, even for a small application. It takes a lot of resources. **host OS - hypervisor - guest OS** |
 | **Containerization** | `Operating System virtualization` | Instead of hardware level, it is an OS virtualization abstraction level. Each application lightweight, isolated, runnable, and portable. New way to package *EVERYTHING* that an app needs to run, regardless of running it in a local or production environment (a.k.a no matter which underlying infrastructure). Example: if you developed your app locally, using the Docker platform, expect it to be successfully deployed. No matter what is the underlying infrastructure. As long as there is a docker engine running on the other side (operation infrastructure using any cloud: AWS, Google, Microsoft, open stack cloud) your application is going to be successfylly deployed there. Running with the exact same behaviour you architectured it to be. |
 | **Docker** | `Containerization` `built around client server architecture` | Open source platform that uses containerization. Package of application and dependencies into lightweight containers. An individual container has only the application and its libraries and dependencies. **Benefits:** Microservices, speed development/deployment/scale up, CI/CD pipelines, resource efficiency/small footprint. **host OS - runtime engine - don't worry about guest OS - container/libs**. Shared resources: if it is not being used by the service, share resources with the other containers. <img width="1230" alt="Screenshot 2024-09-15 at 00 22 42" src="https://github.com/user-attachments/assets/c4f3e584-a306-419c-9598-5565b36cdc72"> |
@@ -101,8 +140,8 @@ CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
 | **Chicken and egg**| `references` | All containers are born from images and images are created from commited containers. Dockerfile can be understood as the first step of the process, automated by Docker itself. |
 | **Dockerfile** | `manifest` | Instructions for building the images. A manifest describes de container, in docker world it would be the Dockerfile (but please remember that containerization concept was created in 2008 before docker existed - released in 2013). **manifest - image - container => for every line it creates de container - executes that line - commits container to a new image - uses it for all subsequent operations** <img width="751" alt="Screenshot 2024-09-15 at 00 21 10" src="https://github.com/user-attachments/assets/6bfdad55-a659-418e-8ae5-c86df000bdfd"> |
 | **Microservices** | `modular application architecture` | Every app function is its own service running in a container. Services communicate via API, in a modular and more flexible way: you can use different languages/frameworks, deploy it fast, if one service fails/crash the rest continue to run in an independent way. It is also possible to add capability to a specific service that is more required e.g. payment service for a webside selling ticket to the final game. |
-| **Monolith** | `rigid application architecture` | You are a dependent on decisions made in the past(language/framework, libraries). Over time it is difficult to grow: what are the dependencies and relationship between the different parts of the software? For deploying it you will have to shut down the app and deploy everything again (sometimes a second instance of the whole application), it takes a long time. |
+| **Monolith** | `rigid application architecture` | You are dependent on decisions made in the past(language/framework, libraries). Over time it is difficult to grow: what are the dependencies and relationship between the different parts of the software? For deploying it you will have to shut down the app and deploy everything again (sometimes a second instance of the whole application), it takes a long time. **SHIFTED FROM DEPLOYING EVERY MONTH TO CONTINUOS INTEGRATION AND CONTINUOS DEVELOPMENT.** |
 | **bare metal** | `bare machine` | Refers to a computer executing instructions directly on logic hardware without an intervening operating system. |
 | **REST API** | | |
-
-
+| **Check docker in your VM** | `docker run -it ubuntu bash` | The purpose of this command is to start a new Ubuntu container and provide you with an interactive Bash shell inside that container. |
+| **Ports** | `80:80 host:dockercontainer` | |
