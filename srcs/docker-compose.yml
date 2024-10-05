@@ -1,43 +1,46 @@
 # defining and running multi-container applications
 # simplifies the control of the entire application stack...
 # ...manage services, networks, and volumes in a single YAML config file
-version: 'x'
+# srcs/docker-compose.yml
+
+# srcs/docker-compose.yml
+# version: '3.8'
 
 services:
-  mariadb:
-    container_name:
-    build:
-    restart:
-    env_file:
-    volumes:
-      -
-    networks:
-      -
-  
-  wordpress:
-    container_name:
-    build:
-    env_file:
-    volumes:
-      -
-    networks:
-      -
-    depends_on:
-      - mariadb
-
   nginx:
-    container_name:
-    build:
-    hostname:
+    build: ./requirements/nginx
+    ports:
+      - "8080:80"
     volumes:
-      -
-    networks:
-      -
+      - ./requirements/nginx/html:/usr/share/nginx/html
     depends_on:
       - wordpress
-    ports:
-      - "443:443"
 
+  wordpress:
+    build: ./requirements/wordpress
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  wordpress_data:
+  db_data:
 
 # version: '3.8'
 

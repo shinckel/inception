@@ -80,6 +80,8 @@ patches: tail -f, bash, sleep infinity, while true.
 - docker rm image-name
 - docker ps -a (list all containers, including the ones that have stopped)
 - docker stop container-name
+- docker network ls (list current docker network)
+- driver: network type
 
 # A basic Apache+PHP Image 
 FROM ubuntu:12.04
@@ -116,6 +118,22 @@ $ docker run -d -t --name mysecondcontainer alpine
 $ docker exec -it mysecondcontainer sh
 > / #
 > exit
+
+$ docker run -itd --rm --name thor busybox (rm remove container after running it)
+> CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS     NAMES
+> a3e817b291a6   nginx     "/docker-entrypoint.…"   20 seconds ago   Up 19 seconds   80/tcp    spiderman
+> 1b41d844c330   busybox   "sh"                     10 minutes ago   Up 10 minutes             batman
+> 6b75aab91b64   busybox   "sh"                     10 minutes ago   Up 10 minutes             thor
+$ ip address show (it will show three new networks, besides loopback, broadcast and docker)
+$ bridge link
+> 29: vethd80e00e@if28: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master docker0 state forwarding priority 32 cost 2 
+> 31: vethb13694d@if30: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master docker0 state forwarding priority 32 cost 2 
+> 33: vethc69260d@if32: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master docker0 state forwarding priority 32 cost 2
+$ docker inspect bridge
+$ docker run -itd --rm -p 80:80 --name spiderman nginx
+$ docker ps
+> CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                               NAMES
+> f7cdd36128cf   nginx     "/docker-entrypoint.…"   2 minutes ago    Up 2 minutes    0.0.0.0:80->80/tcp, :::80->80/tcp   spiderman
 ```
 
 ### References:
@@ -132,7 +150,7 @@ $ docker exec -it mysecondcontainer sh
 |:----|:-----:|:--------:|
 | **VM && docker** | `abstraction layer`| Software is used to create an abstraction layer(virtualization). VM lifecycle is measured in months. Container lifecycle is measured in seconds. |
 | **Virtual machine** | `Hypervisor` | Virtual machine emulates the physical computer, managing the allocation of resources (virtual hardware, virtual CPU, guest OS, etc) from a single physical host. **Benefits:** diverse OS, isolation/separated kernel and OS, set environment for running legacy applications. **Downsides:** deploy a separated guest OS everytime you create a VM, binary library, etc, even for a small application. It takes a lot of resources. **host OS - hypervisor - guest OS** |
-| **Containerization** | `Operating System virtualization` | Instead of hardware level, it is an OS virtualization abstraction level. Each application lightweight, isolated, runnable, and portable. New way to package *EVERYTHING* that an app needs to run, regardless of running it in a local or production environment (a.k.a no matter which underlying infrastructure). Example: if you developed your app locally, using the Docker platform, expect it to be successfully deployed. No matter what is the underlying infrastructure. As long as there is a docker engine running on the other side (operation infrastructure using any cloud: AWS, Google, Microsoft, open stack cloud) your application is going to be successfylly deployed there. Running with the exact same behaviour you architectured it to be. |
+| **Containerization** | `Operating System virtualization` | Instead of hardware level, it is an OS virtualization abstraction level. Each application lightweight, isolated, runnable, and portable. New way to package *EVERYTHING* that an app needs to run, regardless of running it in a local or production environment (a.k.a no matter which underlying infrastructure). Example: if you developed your app locally, using the Docker platform, expect it to be successfully deployed. No matter what is the underlying infrastructure. As long as there is a docker engine running on the other side (operation infrastructure using any cloud: AWS, Google, Microsoft, open stack cloud) your application is going to be successfylly deployed there. Running with the exact same behaviour you architectured it to be. Watch [Why You Need to Learn Containerization](https://www.youtube.com/watch?v=k58COAYTBCM). |
 | **Docker** | `Containerization` `built around client server architecture` | Open source platform that uses containerization. Package of application and dependencies into lightweight containers. An individual container has only the application and its libraries and dependencies. **Benefits:** Microservices, speed development/deployment/scale up, CI/CD pipelines, resource efficiency/small footprint. **host OS - runtime engine - don't worry about guest OS - container/libs**. Shared resources: if it is not being used by the service, share resources with the other containers. <img width="1230" alt="Screenshot 2024-09-15 at 00 22 42" src="https://github.com/user-attachments/assets/c4f3e584-a306-419c-9598-5565b36cdc72"> |
 | **Docker engine** | `orchestrating containers` | Creating, running and orchestrating containers (building - shipping - deploying - managing). Interact with host kernel to allocate resources and force isolation between containers. **Control groups, namespaces**: restrict access and visibility to others. It is built around HTTP REST API. |
 | **Docker image** | `executable packages` | Runtime code/libraries/tools/lightweight standalone, static files. Executable packages, which are built using **Dockerfile**. *TEMPLATE* in which containers are built from. *READ-ONLY, IMMUTABLE.* |
@@ -144,4 +162,11 @@ $ docker exec -it mysecondcontainer sh
 | **bare metal** | `bare machine` | Refers to a computer executing instructions directly on logic hardware without an intervening operating system. |
 | **REST API** | | |
 | **Check docker in your VM** | `docker run -it ubuntu bash` | The purpose of this command is to start a new Ubuntu container and provide you with an interactive Bash shell inside that container. |
-| **Ports** | `80:80 host:dockercontainer` | |
+| **Network** | `80:80 host:dockercontainer` | Container share the same configs as the host e.g. ip address, or port forwarding e.g. into the host OS stack, meaning: host port 8888 inside the app could be running in port 80. |
+| **Bridge network** | `Default bridge` `docker 0 : virtual bridge interface` | Each app has its own ip address (and could share with other containers) `ip address show`. Change network from NAT to Bridge Adapter. Downside: manually expose ports, otherwise you can't access services directly e.g. website. `docker run -itd --rm -p 80:80 --name spiderman nginx`. Each container has its own ip address. Each one has a copy of `/etc/resolv.conf`. |
+| **Volumes** | | Each app has its own filesystem, but you can map files from host directly to your app (keep data, destroy containers). E.g. shared container volumes, doesn't run app only share data. |
+| **Clean cache** | `sudo apt-get clean` `sudo du -sh /* pipe sort -h` | |
+| **User defined bridge** | `docker network create name` | `docker network ls` `ip address show` `hostname -I` will show a new network bridge. `docker run -itd --rm --network [network name] --name [container name] [image name]` `bridge link` `docker inspect [network name]` new interfaces will be tied to the virtual bridge created. Why should I do it? **ISOLATION**, protected from the default network. Check using `ping`, I can ping the new virtual bridge by name `ping [network name]`. |
+| **Host network** | `docker run -itd --rm --network host --name [container name] [image name]` | Moved next to the host, everything is shared with the host e.g. ip address, ports, etc. Downside: no isolation. |
+| **Mac VLAN** | | |
+| **Remove cache** | `sudo apt-get clean` | Remove the package cache to free up space. Remove unused Docker containers, volumes, and networks to free up space `docker container prune -f` `docker volume prune -f` `docker network prune -f`. Check for large log files and remove them `sudo rm -rf /var/log/*.log` |
