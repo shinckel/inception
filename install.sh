@@ -12,3 +12,4 @@
 # sudo mv wordpress /var/www/
 # sudo chown -R www-data:www-data /var/www/wordpress
 # sudo chmod -R 755 /var/www/wordpress
+hjsdhgsa
