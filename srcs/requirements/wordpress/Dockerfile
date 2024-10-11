@@ -1,42 +1,33 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Dockerfile                                         :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: shinckel <shinckel@student.42lisboa.com    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/10/02 12:52:44 by shinckel          #+#    #+#              #
-#    Updated: 2024/10/05 18:10:36 by shinckel         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+FROM debian:bullseye
 
-# build images automatically by reading the instructions from a Dockerfile
-FROM wordpress:latest
+RUN apt update && apt upgrade -y
 
-# FROM debian:buster
+RUN apt install -y \
+		curl \
+		wget \
+		tar \
+		php \
+        php-fpm \
+		php-mysql \
+		redis \
+		php-redis
 
-# EXPOSE 9000
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+  && chmod +x wp-cli.phar \
+  && mv wp-cli.phar /usr/local/bin/wp
 
-# RUN apt-get update && apt-get install -y \
-# 	php7.3-fpm \
-# 	php7.3-mysql \
-# 	mariadb-client \
-# 	curl && \
-# 	rm -rf /var/lib/apt/lists/*
+COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/
 
-# COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d
+RUN mkdir -p /run/php
 
-# ADD https://wordpress.org/latest.tar.gz /var/www/latest.tar.gz
+COPY ./tools/wp_start.sh /usr/local/bin/
 
-# RUN cd /var/www && tar -xvf latest.tar.gz && \
-# 	rm -rf latest.tar.gz
+RUN chmod +x /usr/local/bin/wp_start.sh
 
-# RUN curl https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar --output /usr/bin/wp --silent
+ENTRYPOINT ["/usr/local/bin/wp_start.sh"]
 
-# RUN chmod +x ./usr/bin/wp
+WORKDIR /var/www/html
 
-# RUN mkdir /run/php
+EXPOSE 9000
 
-# COPY ./conf/config.sh /var/www/wordpress/config.sh
-# RUN chmod +x /var/www/wordpress/config.sh
-# CMD ["bash", "/var/www/wordpress/config.sh"]
+CMD [ "/usr/sbin/php-fpm7.4", "-F" ]

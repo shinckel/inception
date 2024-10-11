@@ -46,6 +46,7 @@ clean:
 	sudo docker-compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo apt-get clean
 	@docker container prune -f
+	@docker volume rm $$(docker volume ls -q)
 	@docker volume prune -f
 	@docker network prune -f
 	@docker image prune -a -f

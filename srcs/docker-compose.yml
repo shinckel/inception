@@ -1,90 +1,60 @@
-# defining and running multi-container applications
-# simplifies the control of the entire application stack...
-# ...manage services, networks, and volumes in a single YAML config file
-# srcs/docker-compose.yml
-
-# srcs/docker-compose.yml
-# version: '3.8'
-
+# image: nginx:1.15.12-alpine
+# - ./data/nginx:/etc/nginx/conf.d
+# - "8080:80"
+# it is a serialized docker run command
 services:
   nginx:
     build: ./requirements/nginx
+    container_name: ${CONTAINER_NAME}-nginx
     ports:
-      - "8080:80"
+      - "443:443"
+    restart: always
     volumes:
-      - ./requirements/nginx/html:/usr/share/nginx/html
+      - wp_data:/var/www/html
+    networks:
+      - my_network
     depends_on:
       - wordpress
 
   wordpress:
     build: ./requirements/wordpress
+    container_name: ${CONTAINER_NAME}-wordpress
+    ports:
+      - "9000"
+    # env_file: .env
     environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: "coffee"
       WORDPRESS_DB_NAME: wordpress
     volumes:
-      - wordpress_data:/var/www/html
+      - wp_data:/var/www/html
+    networks:
+      - my_network
     depends_on:
-      - db
+      - mysql
 
-  db:
-    image: mariadb:latest
+  mysql:
+    build: ./requirements/mysql
+    container_name: ${CONTAINER_NAME}-mysql
     environment:
       MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: "coffee"
     volumes:
-      - db_data:/var/lib/mysql
+      - wp_data:/var/www/html
+
+networks:
+  my_network:
+    name: inception
+    driver: bridge
 
 volumes:
-  wordpress_data:
-  db_data:
-
-# version: '3.8'
-
-# services:
-#   mariadb:
-#     build: ./requirements/mariadb
-#     container_name: mariadb
-#     environment:
-#       MYSQL_ROOT_PASSWORD: my-secret-pw
-#       MYSQL_DATABASE: wordpress
-#     volumes:
-#       - mariadb_data:/var/lib/mysql
-#     networks:
-#       - wordpress-network
-#     restart: always
-
-#   wordpress:
-#     build: ./requirements/wordpress
-#     container_name: wordpress
-#     environment:
-#       WORDPRESS_DB_HOST: mariadb
-#       WORDPRESS_DB_USER: root
-#       WORDPRESS_DB_PASSWORD: my-secret-pw
-#       WORDPRESS_DB_NAME: wordpress
-#     volumes:
-#       - wordpress_data:/var/www/html
-#     networks:
-#       - wordpress-network
-#     restart: always
-
-#   nginx:
-#     build: ./requirements/nginx
-#     container_name: nginx
-#     ports:
-#       - "443:443"
-#     volumes:
-#       - ./requirements/nginx/ssl:/etc/nginx/ssl
-#     networks:
-#       - wordpress-network
-#     restart: always
-
-# volumes:
-#   mariadb_data:
-#   wordpress_data:
-
-# networks:
-#   wordpress-network:
+  wp_data:
+    #set to local to stored the volume on the host machine
+    driver: local
+    driver_opts:
+      type: none
+      # device in my local machine
+      # device: /home/ubuntu/data/wp_data
+      device: ../data/wp_data
+      o: bind

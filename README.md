@@ -34,8 +34,11 @@ Your containers have to restart in case of a crash.
 ----| mariadb/ (database)
 -----| Dockerfile
 ----| nginx/ (web server)
+-----| conf/
 -----| Dockerfile
 ----| wordpress
+-----| conf
+-----| tools
 -----| Dockerfile
 | Makefile
 ```
@@ -170,3 +173,7 @@ $ docker ps
 | **Host network** | `docker run -itd --rm --network host --name [container name] [image name]` | Moved next to the host, everything is shared with the host e.g. ip address, ports, etc. Downside: no isolation. |
 | **Mac VLAN** | | |
 | **Remove cache** | `sudo apt-get clean` | Remove the package cache to free up space. Remove unused Docker containers, volumes, and networks to free up space `docker container prune -f` `docker volume prune -f` `docker network prune -f`. Check for large log files and remove them `sudo rm -rf /var/log/*.log` |
+| **Verify port mapping** | `sudo netstat -tuln [pipe] grep 80` | `tcp 0 0 0.0.0.0:80 0.0.0 0:* LISTEN` |
+| **** | `docker network inspect my_custom_network` | |
+| | | `docker-compose -p srcs restart nginx` `docker-compose -p srcs ps` `docker-compose -p srcs logs wordpress` `docker exec -it inception-nginx apt-get install -y telnet` `docker exec -it inception-nginx telnet wordpress 9000` `sudo systemctl status docker` |
+

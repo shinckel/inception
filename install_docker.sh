@@ -48,3 +48,12 @@ echo -e "${GREEN}Docker and Docker Compose installation completed successfully.$
 
 # Apply the changes immediately
 sudo newgrp docker
+
+# install apache
+# sudo apt update
+# sudo apt install apache2
+
+# sudo apt install php libapache2-mod-php php-mysql php-xml php-mbstring php-curl php-zip
+
+# sudo apt install mysql-server
+# sudo mysql_secure_installation
