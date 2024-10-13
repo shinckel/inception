@@ -174,6 +174,13 @@ $ docker ps
 | **Mac VLAN** | | |
 | **Remove cache** | `sudo apt-get clean` | Remove the package cache to free up space. Remove unused Docker containers, volumes, and networks to free up space `docker container prune -f` `docker volume prune -f` `docker network prune -f`. Check for large log files and remove them `sudo rm -rf /var/log/*.log` |
 | **Verify port mapping** | `sudo netstat -tuln [pipe] grep 80` | `tcp 0 0 0.0.0.0:80 0.0.0 0:* LISTEN` |
-| **** | `docker network inspect my_custom_network` | |
-| | | `docker-compose -p srcs restart nginx` `docker-compose -p srcs ps` `docker-compose -p srcs logs wordpress` `docker exec -it inception-nginx apt-get install -y telnet` `docker exec -it inception-nginx telnet wordpress 9000` `sudo systemctl status docker` |
+| **Check if services are network connected** | `docker network inspect my_custom_network` | It will return an object containing connected services. |
+| **Useful commands** | `troubleshooting` | `docker-compose -p srcs restart nginx` `docker-compose -p srcs ps` `docker-compose -p srcs logs wordpress` `docker exec -it inception-nginx apt-get install -y telnet` `docker exec -it inception-nginx telnet wordpress 9000` `sudo systemctl status docker` |
 
+Ensure the directories have the correct permissions so that Docker can access them:
+sudo chown -R ubuntu:ubuntu /home/ubuntu/data/wp_data
+sudo chown -R ubuntu:ubuntu /home/ubuntu/data/db_data
+sudo chmod -R 755 /home/ubuntu/data/wp_data
+sudo chmod -R 755 /home/ubuntu/data/db_data
+
+docker inspect 4dad940eafe4 | grep -i env

@@ -1,14 +1,12 @@
-# image: nginx:1.15.12-alpine
-# - ./data/nginx:/etc/nginx/conf.d
-# - "8080:80"
-# it is a serialized docker run command
 services:
   nginx:
     build: ./requirements/nginx
+    image: nginx
     container_name: ${CONTAINER_NAME}-nginx
     ports:
-      - "443:443"
-    restart: always
+      - "443:443"  # Map port 8080 on the host to port 80 in the container
+    env_file:
+      - .env
     volumes:
       - wp_data:/var/www/html
     networks:
@@ -18,30 +16,49 @@ services:
 
   wordpress:
     build: ./requirements/wordpress
+    image: wordpress
     container_name: ${CONTAINER_NAME}-wordpress
-    ports:
+    ports: #definition of ports to open
       - "9000"
-    # env_file: .env
-    environment:
-      WORDPRESS_DB_HOST: mysql
-      WORDPRESS_DB_USER: root
-      WORDPRESS_DB_PASSWORD: "coffee"
-      WORDPRESS_DB_NAME: wordpress
+    env_file:
+      - .env
+    # environment:
+    #   WORDPRESS_DB_HOST: mysql:3306
+    #   WORDPRESS_DB_USER: ${MYSQL_USER}
+    #   WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+    #   WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    #   WP_URL: http://localhost:8080
+    #   WP_TITLE: "My WordPress Site"
+    #   WP_ADMIN: admin
+    #   WP_ADMIN_PASSWORD: admin_password
+    #   WP_ADMIN_EMAIL: admin@example.com
+    #   WP_USER: author
+    #   WP_USER_PASSWORD: author_password
+    #   WP_USER_EMAIL: author@example.com
     volumes:
       - wp_data:/var/www/html
     networks:
       - my_network
     depends_on:
-      - mysql
+      - mariadb
 
-  mysql:
-    build: ./requirements/mysql
-    container_name: ${CONTAINER_NAME}-mysql
-    environment:
-      MYSQL_DATABASE: wordpress
-      MYSQL_ROOT_PASSWORD: "coffee"
+  mariadb:
+    build: ./requirements/mariadb
+    image: mariadb
+    container_name: ${CONTAINER_NAME}-mariadb
+    env_file:
+      - .env
+    # environment:
+    #   MYSQL_DATABASE: ${MYSQL_DATABASE}
+    #   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    #   MYSQL_USER: ${MYSQL_USER}
+    #   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - wp_data:/var/www/html
+      - db_data:/var/lib/mysql
+    networks:
+      - my_network
+    ports:
+      - "3306"
 
 networks:
   my_network:
@@ -50,11 +67,14 @@ networks:
 
 volumes:
   wp_data:
-    #set to local to stored the volume on the host machine
     driver: local
     driver_opts:
       type: none
-      # device in my local machine
-      # device: /home/ubuntu/data/wp_data
-      device: ../data/wp_data
+      device: /home/ubuntu/data/wp_data
+      o: bind
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ubuntu/data/db_data
       o: bind

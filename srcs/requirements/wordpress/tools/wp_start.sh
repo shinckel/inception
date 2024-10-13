@@ -1,44 +1,40 @@
 #!/bin/sh
 
-#check if wp-config.php exist
-if [ -f ./wp-config.php ]
-then
-	echo "wordpress already downloaded"
+# Check if wp-config.php exists
+if [ -f /var/www/html/wp-config.php ]; then
+    echo "WordPress already configured"
 else
+    # Move the wp-config.php to the correct location
+    mv ./wp-config.php /var/www/html/
+    cd /var/www/html/
 
-####### MANDATORY PART ##########
+    # Change the ownership of the wp-config.php file to the current user
+    chown $(whoami):$(whoami) /var/www/html/wp-config.php
 
-	#Download wordpress and all config file
-	wget http://wordpress.org/latest.tar.gz
-	tar xfz latest.tar.gz
-	mv wordpress/* .
-	rm -rf latest.tar.gz
-	rm -rf wordpress
+    # Replace placeholders in wp-config.php with actual values
+    sed -i "s/__MYSQL_DATABASE__/$MYSQL_DATABASE/g" /var/www/html/wp-config.php 
+    sed -i "s/__MYSQL_USER__/$MYSQL_USER/g" /var/www/html/wp-config.php
+    sed -i "s/__MYSQL_PASSWORD__/$MYSQL_PASSWORD/g" /var/www/html/wp-config.php
+    sed -i "s/__DOCKERCONTAINERNAME__/$WORDPRESS_DB_HOST/g" /var/www/html/wp-config.php
 
-	#Inport env variables in the config file
-	sed -i "s/username_here/$MYSQL_USER/g" wp-config-sample.php
-	sed -i "s/password_here/$MYSQL_PASSWORD/g" wp-config-sample.php
-	sed -i "s/localhost/$MYSQL_HOSTNAME/g" wp-config-sample.php
-	sed -i "s/database_name_here/$MYSQL_DATABASE/g" wp-config-sample.php
-	cp wp-config-sample.php wp-config.php
-###################################
+    # Wait for the database to be ready
+    until mysqladmin ping -h"$WORDPRESS_DB_HOST" --silent; do
+        echo "Waiting for database connection..."
+        sleep 2
+    done
 
-####### BONUS PART ################
+    # Create WordPress configuration
+    wp config create --dbname=$MYSQL_DATABASE --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASSWORD --dbhost=$WORDPRESS_DB_HOST --allow-root
 
-## redis ##
+    # Install WordPress
+    wp core install --url=$WP_URL --title="$WP_TITLE" --admin_user=$WP_ADMIN --admin_password=$WP_ADMIN_PASSWORD --admin_email="$WP_ADMIN_EMAIL" --allow-root
 
-	wp config set WP_REDIS_HOST redis --allow-root #I put --allowroot because i am on the root user on my VM
-  	wp config set WP_REDIS_PORT 6379 --raw --allow-root
- 	wp config set WP_CACHE_KEY_SALT $DOMAIN_NAME --allow-root
-  	#wp config set WP_REDIS_PASSWORD $REDIS_PASSWORD --allow-root
- 	wp config set WP_REDIS_CLIENT phpredis --allow-root
-	wp plugin install redis-cache --activate --allow-root
-    wp plugin update --all --allow-root
-	wp redis enable --allow-root
+    # Create a WordPress user
+    wp user create $WP_USER "$WP_USER_EMAIL" --role=author --user_pass=$WP_USER_PASSWORD --allow-root
 
-###  end of redis part  ###
-
-###################################
+    # Change the owner of the wp-content directory to www-data
+    chown -R www-data:www-data /var/www/html/wp-content
 fi
 
-exec "$@"
+# Start PHP-FPM in the foreground
+exec /usr/sbin/php-fpm7.4 -F
