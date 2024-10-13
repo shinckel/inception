@@ -39,16 +39,16 @@
 
 # Build and start the containers
 all:
-	docker-compose -f srcs/docker-compose.yml up -d && echo "Containers ready to ROCKKKK!!!"
+	sudo docker-compose -f srcs/docker-compose.yml up -d && echo "Containers ready to ROCKKKK!!!"
 
 # Clean up (remove containers, networks, volumes, and images created by up)
 clean:
 	sudo docker-compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo apt-get clean
-	@docker container prune -f
-	@docker volume prune -f
-	@docker network prune -f
-	@docker image prune -a -f
+	@sudo docker container prune -f
+	@sudo docker volume prune -f
+	@sudo docker network prune -f
+	@sudo docker image prune -a -f
 	@sudo rm -rf /var/log/*.log
 	@sudo apt-get autoremove --purge -y
 

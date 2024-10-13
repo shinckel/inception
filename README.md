@@ -184,3 +184,9 @@ sudo chmod -R 755 /home/ubuntu/data/wp_data
 sudo chmod -R 755 /home/ubuntu/data/db_data
 
 docker inspect 4dad940eafe4 | grep -i env
+
+check ssl connection
+openssl s_client -connect shinckel.42.fr:443
+
+Since UFW is inactive, your firewall isn't blocking any connections.
+sudo ufw status

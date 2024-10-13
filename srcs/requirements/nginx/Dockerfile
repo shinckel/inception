@@ -26,8 +26,8 @@ RUN openssl req \
 
 COPY conf/nginx.conf /etc/nginx/conf.d/
 
-COPY ./conf/server.crt /etc/nginx/ssl/server.crt
-COPY ./conf/server.key /etc/nginx/ssl/server.key
+# COPY ./conf/server.crt /etc/nginx/ssl/server.crt
+# COPY ./conf/server.key /etc/nginx/ssl/server.key
 
 EXPOSE 443
 
