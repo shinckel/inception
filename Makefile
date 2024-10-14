@@ -1,64 +1,35 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: shinckel <shinckel@student.42lisboa.com    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/10/02 12:53:02 by shinckel          #+#    #+#              #
-#    Updated: 2024/10/05 18:17:36 by shinckel         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-# all:
-# 	@sudo hostsed add 127.0.0.1 shinckel.42.fr && echo "successfully added shinckel.42.fr to /etc/hosts"
-# 	sudo docker compose -f ./srcs/docker-compose.yml up -d
-
-# clean:
-# 	sudo docker compose -f ./srcs/docker-compose.yml down --rmi all -v
-
-# fclean: clean
-# 	@sudo hostsed rm 127.0.0.1 shinckel.42.fr && echo "successfully removed shinckel.42.fr to /etc/hosts"
-# 	@if [ -d "/home/shinckel/data/wordpress" ]; then \
-# 	sudo rm -rf /home/shinckel/data/wordpress/* && \
-# 	echo "successfully removed all contents from /home/shinckel/data/wordpress/"; \
-# 	fi;
-
-# 	@if [ -d "/home/shinckel/data/mariadb" ]; then \
-# 	sudo rm -rf /home/shinckel/data/mariadb/* && \
-# 	echo "successfully removed all contents from /home/shinckel/data/mariadb/"; \
-# 	fi;
-
-# re: fclean all
-
-# ls:
-# 	sudo docker image ls
-# 	sudo docker ps
-
-# .PHONY: all, clean, fclean, re, ls
-
 # Build and start the containers
 all:
-	sudo docker-compose -f srcs/docker-compose.yml up -d && echo "Containers ready to ROCKKKK!!!"
+	@echo "Adding shinckel.42.fr to /etc/hosts"
+	@echo "127.0.0.1 shinckel.42.fr" | sudo tee -a /etc/hosts > /dev/null
+	@sudo docker-compose -f srcs/docker-compose.yml up -d --build && echo "Containers are up and running!"
 
-# Clean up (remove containers, networks, volumes, and images created by up)
 clean:
-	sudo docker-compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
+	@sudo docker-compose -f srcs/docker-compose.yml down --rmi all -v
 	@sudo apt-get clean
 	@sudo docker container prune -f
 	@sudo docker volume prune -f
 	@sudo docker network prune -f
 	@sudo docker image prune -a -f
-	@sudo rm -rf /var/log/*.log
-	@sudo apt-get autoremove --purge -y
+	@echo "Cleanup completed!"
 
-# Restart the containers
-restart:
-	docker-compose -f srcs/docker-compose.yml down
-	docker-compose -f srcs/docker-compose.yml up -d
+fclean: clean
+	docker system prune -a
+	@echo "Removing shinckel.42.fr from /etc/hosts"
+	@sudo sed -i '/shinckel.42.fr/d' /etc/hosts
+	@if [ -d "/home/shinckel/Documents/data/wp_data" ]; then \
+		sudo rm -rf /home/shinckel/Documents/data/wp_data/* && \
+		echo "successfully removed all contents from /home/shinckel/Documents/data/wp_data/"; \
+	fi;
+	@if [ -d "/home/shinckel/Documents/data/db_data" ]; then \
+		sudo rm -rf /home/shinckel/Documents/data/db_data/* && \
+		echo "successfully removed all contents from /home/shinckel/Documents/data/db_data/"; \
+	fi;
+
+re: fclean all
 
 ls:
-	sudo docker image ls
-	sudo docker ps
+	@sudo docker image ls
+	@sudo docker ps
 
-.PHONY: all, clean, ls
+.PHONY: all clean fclean re ls

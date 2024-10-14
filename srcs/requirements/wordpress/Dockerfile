@@ -33,21 +33,24 @@
 # CMD [ "/usr/sbin/php-fpm7.4", "-F" ]
 
 FROM debian:bullseye
+#oldstable is the codename for Debian 10
 
-RUN apt update && apt upgrade -y && \
-    apt install -y \
-        curl \
-        wget \
-        tar \
-        php7.4 \
-        php7.4-fpm \
-        php7.4-mysql \
-        php7.4-mbstring \
-        php7.4-xml \
-        php7.4-curl \
-        redis \
-        php7.4-redis && \
-    apt clean && rm -rf /var/lib/apt/lists/*
+RUN echo "Dockerfile running for wordpress"
+
+RUN apt-get update && apt-get -y install \
+	wget \
+	curl \
+	bash \
+	php \
+	php-cgi \
+	php-mysql \
+	php-fpm \
+	php-pdo \
+	php-gd php-cli \
+	php-mbstring \
+	redis \
+	php-redis \
+	&& rm -rf /var/lib/apt/lists/*
 
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
     && chmod +x wp-cli.phar \
@@ -67,4 +70,4 @@ WORKDIR /var/www/html
 
 EXPOSE 9000
 
-CMD ["php-fpm7.4", "-F"]
+CMD ["/usr/sbin/php-fpm7.4", "-F"]

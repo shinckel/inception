@@ -30,15 +30,20 @@ Your containers have to restart in case of a crash.
 ```
 -| srcs/
 ---| docker-compose
+---| .env
 ---| requirements/
 ----| mariadb/ (database)
+-----| tools/
+------| db_start.sh
+------| mysqld.conf
+------| wordpress.sql
 -----| Dockerfile
 ----| nginx/ (web server)
 -----| conf/
 -----| Dockerfile
 ----| wordpress
------| conf
------| tools
+-----| conf/
+-----| tools/
 -----| Dockerfile
 | Makefile
 ```
@@ -190,3 +195,33 @@ openssl s_client -connect shinckel.42.fr:443
 
 Since UFW is inactive, your firewall isn't blocking any connections.
 sudo ufw status
+
+```
+shinckel@inceptionVirtualMachine:~/Documents/inception$ sudo docker exec -it 
+inception-mariadb env
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=3cf14098864a
+TERM=xterm
+WORDPRESS_ADMIN_PASSWORD=adminpass
+WORDPRESS_ADMIN_USER=admin
+MYSQL_DATABASE=wordpress
+MYSQL_ROOT_PASSWORD=superpass
+WORDPRESS_TITLE=My WordPress Site
+DOMAIN_NAME=shinckel.42.fr
+WORDPRESS_URL=http://shinckel.42.fr
+WORDPRESS_ADMIN_EMAIL=admin@shinckel.42.fr
+CONTAINER_NAME=inception
+MYSQL_HOSTNAME=mariadb
+WORDPRESS_DEBUG=false
+MYSQL_USER=shinckel
+WORDPRESS_TABLE_PREFIX=wp_
+MYSQL_PASSWORD=pass
+GOSU_VERSION=1.17
+LANG=C.UTF-8
+MARIADB_VERSION=1:11.5.2+maria~ubu2404
+HOME=/root
+```
+
+run docker with no sudo
+sudo usermod -aG docker $USER
+

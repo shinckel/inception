@@ -1,21 +1,21 @@
 services:
-  nginx:
-    build: ./requirements/nginx/.
-    image: nginx
-    container_name: ${CONTAINER_NAME}-nginx
-    ports:
-      - "443:443"  # Map port 8080 on the host to port 80 in the container
+
+  mariadb:
+    build: ./requirements/mariadb
+    image: mariadb
+    container_name: ${CONTAINER_NAME}-mariadb
     env_file:
       - .env
     volumes:
-      - wp_data:/var/www/html
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: "always"
     networks:
       - my_network
-    depends_on:
-      - wordpress
 
   wordpress:
-    build: ./requirements/wordpress/.
+    build: ./requirements/wordpress
     image: wordpress
     container_name: ${CONTAINER_NAME}-wordpress
     ports: #definition of ports to open
@@ -24,23 +24,27 @@ services:
       - .env
     volumes:
       - wp_data:/var/www/html
+    restart: "always"
     networks:
       - my_network
     depends_on:
       - mariadb
 
-  mariadb:
-    build: ./requirements/mariadb/.
-    image: mariadb
-    container_name: ${CONTAINER_NAME}-mariadb
+  nginx:
+    build: ./requirements/nginx
+    image: nginx
+    container_name: ${CONTAINER_NAME}-nginx
+    ports:
+      - "443:443"  # Map port 8080 on the host to port 80 in the container
     env_file:
       - .env
     volumes:
-      - db_data:/var/lib/mysql
+      - wp_data:/var/www/html
+    restart: "always"
     networks:
       - my_network
-    ports:
-      - "3306:3306"
+    depends_on:
+      - wordpress
 
 networks:
   my_network:
@@ -49,6 +53,7 @@ networks:
 
 volumes:
   wp_data:
+    name: wp_data
     driver: local
     driver_opts:
       type: none
@@ -56,6 +61,7 @@ volumes:
       # device: /home/ubuntu/data/wp_data directory in my personal computer
       o: bind
   db_data:
+    name: db_data
     driver: local
     driver_opts:
       type: none
