@@ -9,7 +9,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3306"
     restart: "always"
     networks:
       - my_network
@@ -18,8 +18,8 @@ services:
     build: ./requirements/wordpress
     image: wordpress
     container_name: ${CONTAINER_NAME}-wordpress
-    ports: #definition of ports to open
-      - "9000:9000"
+    ports:
+      - "9000"
     env_file:
       - .env
     volumes:
@@ -35,7 +35,7 @@ services:
     image: nginx
     container_name: ${CONTAINER_NAME}-nginx
     ports:
-      - "443:443"  # Map port 8080 on the host to port 80 in the container
+      - "443:443" #host:container
     env_file:
       - .env
     volumes:
@@ -57,14 +57,14 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/shinckel/Documents/data/wp_data
-      # device: /home/ubuntu/data/wp_data directory in my personal computer
+      # device: /home/shinckel/Documents/data/wp_data
+      device: /home/ubuntu/data/wp_data # directory in my personal computer
       o: bind
   db_data:
     name: db_data
     driver: local
     driver_opts:
       type: none
-      device: /home/shinckel/Documents/data/db_data
-      # device: /home/ubuntu/data/db_data
+      # device: /home/shinckel/Documents/data/db_data
+      device: /home/ubuntu/data/db_data
       o: bind

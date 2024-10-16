@@ -25,6 +25,14 @@ fclean: clean
 		sudo rm -rf /home/shinckel/Documents/data/db_data/* && \
 		echo "successfully removed all contents from /home/shinckel/Documents/data/db_data/"; \
 	fi;
+		@if [ -d "/home/ubuntu/data/wp_data" ]; then \
+		sudo rm -rf /home/ubuntu/data/wp_data/* && \
+		echo "successfully removed all contents from /home/ubuntu/data/wp_data/"; \
+	fi;
+	@if [ -d "/home/ubuntu/data/db_data" ]; then \
+		sudo rm -rf /home/ubuntu/data/db_data/* && \
+		echo "successfully removed all contents from /home/ubuntu/data/db_data/"; \
+	fi;
 
 re: fclean all
 

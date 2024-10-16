@@ -1,5 +1,5 @@
 FROM debian:bullseye
-# oldstable is the codename for Debian 10
+# bullseye is the codename for Debian 11
 
 RUN echo "Dockerfile running for mariadb"
 
