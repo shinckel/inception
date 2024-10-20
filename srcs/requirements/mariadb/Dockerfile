@@ -18,7 +18,7 @@ EXPOSE 3306
 COPY ./tools/mysqld.conf /etc/mysql/my.cnf
 
 # Update this line to reflect the correct path for wordpress.sql
-COPY ./tools/wordpress.sql /usr/local/bin
+# COPY ./tools/wordpress.sql /usr/local/bin
 
 # Update this line to reflect the correct path for db_start.sh
 COPY ./tools/db_start.sh /usr/local/bin

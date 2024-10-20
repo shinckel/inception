@@ -42,8 +42,12 @@ GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD'; FLUSH PRIVI
 CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE; GRANT ALL ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD'; FLUSH PRIVILEGES;
 EOS
 
-    echo "Importing WordPress database" >> $LOGFILE
-    mariadb -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < /usr/local/bin/wordpress.sql >> $LOGFILE 2>&1
+    # echo "Importing WordPress database" >> $LOGFILE
+    # mariadb -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < /usr/local/bin/wordpress.sql >> $LOGFILE 2>&1
+
+    # Verify user creation and privileges
+    echo "Verifying user creation and privileges" >> $LOGFILE
+    mariadb -u root -p$MYSQL_ROOT_PASSWORD -e "SHOW GRANTS FOR '$MYSQL_USER'@'%';" >> $LOGFILE 2>&1
 fi
 
 echo "Stopping MariaDB service" >> $LOGFILE

@@ -1,8 +1,9 @@
 # Build and start the containers
+# flag -d --build will run docker in the backgroung
 all:
 	@echo "Adding shinckel.42.fr to /etc/hosts"
 	@echo "127.0.0.1 shinckel.42.fr" | sudo tee -a /etc/hosts > /dev/null
-	@sudo docker-compose -f srcs/docker-compose.yml up -d --build && echo "Containers are up and running!"
+	@sudo docker-compose -f srcs/docker-compose.yml up --build && echo "Containers are up and running!"
 
 clean:
 	@sudo docker-compose -f srcs/docker-compose.yml down --rmi all -v
@@ -14,16 +15,16 @@ clean:
 	@echo "Cleanup completed!"
 
 fclean: clean
-	docker system prune -a
+	y | docker system prune -a
 	@echo "Removing shinckel.42.fr from /etc/hosts"
 	@sudo sed -i '/shinckel.42.fr/d' /etc/hosts
-	@if [ -d "/home/shinckel/Documents/data/wp_data" ]; then \
-		sudo rm -rf /home/shinckel/Documents/data/wp_data/* && \
-		echo "successfully removed all contents from /home/shinckel/Documents/data/wp_data/"; \
+	@if [ -d "/home/shinckel/data/wp_data" ]; then \
+		sudo rm -rf /home/shinckel/data/wp_data/* && \
+		echo "successfully removed all contents from /home/shinckel/data/wp_data/"; \
 	fi;
-	@if [ -d "/home/shinckel/Documents/data/db_data" ]; then \
-		sudo rm -rf /home/shinckel/Documents/data/db_data/* && \
-		echo "successfully removed all contents from /home/shinckel/Documents/data/db_data/"; \
+	@if [ -d "/home/shinckel/data/db_data" ]; then \
+		sudo rm -rf /home/shinckel/data/db_data/* && \
+		echo "successfully removed all contents from /home/shinckel/data/db_data/"; \
 	fi;
 		@if [ -d "/home/ubuntu/data/wp_data" ]; then \
 		sudo rm -rf /home/ubuntu/data/wp_data/* && \
