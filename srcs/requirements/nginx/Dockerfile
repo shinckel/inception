@@ -17,25 +17,12 @@ RUN apt update && apt upgrade -y
 
 RUN apt install -y nginx openssl
 
-# RUN openssl req \
-# -x509 \
-# -days 365 \
-# -nodes \
-# -newkey rsa:2048 \
-# -sha256 \
-# -subj "/C=PT/L=Lisbon/O=42 Lisboa/CN=shinckel.42.fr" \
-# -out /etc/nginx/ssl/shinckel.crt \
-# -keyout /etc/nginx/ssl/shinckel.key 
-
 RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
        -out /etc/nginx/ssl/shinckel.crt \
        -keyout /etc/nginx/ssl/shinckel.key \
        -subj "/C=PR/ST=Lisbon/L=Lisbon/O=42 School/OU=shinckel/CN=shinckel/"
 
 COPY conf/nginx.conf /etc/nginx/conf.d/
-
-# COPY ./conf/server.crt /etc/nginx/ssl/server.crt
-# COPY ./conf/server.key /etc/nginx/ssl/server.key
 
 RUN mkdir -p /run/nginx
 
