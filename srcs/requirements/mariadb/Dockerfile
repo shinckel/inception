@@ -14,13 +14,11 @@ RUN mkdir -p /var/run/mysqld \
 
 EXPOSE 3306
 
-# Update this line to reflect the correct path for mysqld.conf
 COPY ./tools/mysqld.conf /etc/mysql/my.cnf
 
-# Update this line to reflect the correct path for wordpress.sql
+# use preset wordpress.sql, no wordpress template
 # COPY ./tools/wordpress.sql /usr/local/bin
 
-# Update this line to reflect the correct path for db_start.sh
 COPY ./tools/db_start.sh /usr/local/bin
 
 RUN chmod +x /usr/local/bin/db_start.sh

@@ -1,4 +1,4 @@
-# Build and start the containers
+# build and start the containers
 # flag -d --build will run docker in the backgroung
 all:
 	@echo "Adding shinckel.42.fr to /etc/hosts"
