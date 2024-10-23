@@ -225,3 +225,16 @@ HOME=/root
 run docker with no sudo
 sudo usermod -aG docker $USER
 
+
+mariadb -u root -p
+show DATABASES;
+USE inception;
+SHOW TABLES;
+
+SELECT ID, post_title, post_date, post_status FROM wp_posts WHERE post_type = 'post' AND post_status = 'publish';
+
+SELECT comment_ID, comment_post_ID, comment_content, comment_date, comment_approved 
+FROM wp_comments 
+WHERE comment_post_ID = 1;
+
+SELECT ID, user_login, user_email, user_registered, display_name FROM wp_users;
