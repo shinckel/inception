@@ -57,14 +57,14 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/shinckel/data/wp_data
-      # device: /home/ubuntu/data/wp_data # directory in my personal computer
+      # device: /home/shinckel/data/wp_data
+      device: /home/ubuntu/data/wp_data # directory in my personal computer
       o: bind
   db_data:
     name: db_data
     driver: local
     driver_opts:
       type: none
-      device: /home/shinckel/data/db_data
-      # device: /home/ubuntu/data/db_data
+      # device: /home/shinckel/data/db_data
+      device: /home/ubuntu/data/db_data
       o: bind
